@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111827"><title>Tech World | All Tech Solutions</title>
+<style>
+:root{--ink:#111827;--red:#e53935;--muted:#6b7280;--line:#e5e7eb;--bg:#f7f8fa}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--ink);background:var(--bg)}
+header{background:#111827;color:white;padding:18px 16px;position:sticky;top:0;z-index:5;box-shadow:0 2px 10px #0002}
+.top{max-width:1100px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-size:25px;font-weight:850;letter-spacing:-1px}.brand span{color:#ff514c}.tag{font-size:11px;color:#d1d5db;letter-spacing:2px}
+button,.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;background:var(--red);color:white}
+button.secondary{background:#374151}button.light{background:white;color:#111827;border:1px solid var(--line)}
+main{max-width:1100px;margin:22px auto;padding:0 14px}
+.hero{background:linear-gradient(120deg,#1f2937,#111827);color:white;padding:28px;border-radius:18px;margin-bottom:20px}
+.hero h1{margin:0 0 8px;font-size:clamp(25px,5vw,38px)}.hero p{margin:0;color:#d1d5db}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.tools input{flex:1;min-width:180px}
+input,select,textarea{font:inherit;padding:11px 12px;border:1px solid #d1d5db;border-radius:10px;background:white;width:100%}
+.categories{display:flex;gap:8px;overflow:auto;padding:2px 0 14px}.cat{white-space:nowrap;background:white;color:#374151;border:1px solid var(--line)}.cat.active{background:#111827;color:white}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px}
+.product{background:white;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.product img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#eef0f3}.pbody{padding:12px;display:flex;flex-direction:column;gap:7px;flex:1}
+.pname{font-weight:750}.category{font-size:12px;color:var(--muted)}.price{font-weight:850;color:var(--red);font-size:18px}.pbody button{margin-top:auto}
+.empty{padding:30px;text-align:center;color:var(--muted);background:white;border-radius:14px}
+footer{text-align:center;color:var(--muted);padding:28px 12px;font-size:13px}
+.panel{display:none;background:white;border:1px solid var(--line);padding:16px;border-radius:16px;margin:18px 0}.panel.show{display:block}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.formgrid .wide{grid-column:1/-1}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{flex:1}
+.adminlist{display:grid;gap:8px;margin-top:12px}.adminitem{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.modalbg{display:none;position:fixed;inset:0;background:#0008;z-index:10;align-items:center;justify-content:center;padding:16px}.modalbg.show{display:flex}.modal{background:white;border-radius:16px;padding:18px;width:min(420px,100%)}
+@media(max-width:560px){.formgrid{grid-template-columns:1fr}.formgrid .wide{grid-column:auto}.brand{font-size:21px}.hero{padding:22px}}
+</style>
+</head>
+<body>
+<header><div class="top"><div><div class="brand"><span>Tech</span> World</div><div class="tag">ALL TECH SOLUTIONS</div></div><div class="row" style="flex:0 0 auto"><button class="secondary" id="cartBtn">Cart (<span id="cartCount">0</span>)</button><button class="light" id="adminBtn">Admin</button></div></div></header>
+<main>
+<section class="hero"><h1>Welcome to Tech World</h1><p>Explore your favourite tech products and order easily on WhatsApp.</p></section>
+<section class="tools"><input id="search" placeholder="Search products..."><select id="sort" style="max-width:170px"><option value="default">Sort: Featured</option><option value="low">Price: Low to high</option><option value="high">Price: High to low</option></select></section>
+<nav class="categories" id="categories"></nav>
+<section id="products" class="grid"></section>
+<section id="adminPanel" class="panel">
+ <div class="row"><h2 style="margin:0;flex:1">Admin Panel</h2><button class="secondary" id="logoutBtn">Log out</button></div>
+ <p id="adminStatus" style="color:#6b7280;font-size:13px">Sign in to manage products.</p>
+ <form id="productForm" class="formgrid">
+  <input name="name" placeholder="Product name" required>
+  <input name="price" type="number" min="0" step="0.01" placeholder="Price (BDT)" required>
+  <input name="category" placeholder="Category (e.g. Charger)" required>
+  <input name="image_url" placeholder="Product image URL">
+  <textarea name="description" class="wide" rows="2" placeholder="Short description (optional)"></textarea>
+  <button class="wide" type="submit">Add product</button>
+ </form>
+ <div id="adminList" class="adminlist"></div>
+</section>
+</main>
+<footer>Tech World · WhatsApp: 01818830115 · All prices in BDT</footer>
+<div class="modalbg" id="modal"><div class="modal"><h2 id="modalTitle">Your cart</h2><div id="cartItems"></div><p><b>Total: ৳<span id="cartTotal">0</span></b></p><input id="customerName" placeholder="Your name"><input id="customerAddress" style="margin-top:8px" placeholder="Delivery address"><button id="orderBtn" style="width:100%;margin-top:10px">Order on WhatsApp</button><button class="light" id="closeModal" style="width:100%;margin-top:8px">Continue shopping</button></div></div>
+<div class="modalbg" id="loginModal"><div class="modal"><h2>Admin sign in</h2><input id="email" type="email" placeholder="Admin email"><input id="password" type="password" placeholder="Password" style="margin-top:8px"><button id="loginBtn" style="width:100%;margin-top:10px">Sign in</button><button class="light" id="closeLogin" style="width:100%;margin-top:8px">Close</button><p id="loginError" style="color:#c00;font-size:13px"></p></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const WHATSAPP = "8801818830115";
+const SUPABASE_URL = "https://mbodficljrtflnobnljn.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_4vCJ2ySo0HNyWrbHZN4psQ_pqNMEe64";
+const configured = !SUPABASE_URL.startsWith("YOUR_") && !SUPABASE_ANON_KEY.startsWith("YOUR_");
+const db = configured ? window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY) : null;
+let products=[], category="All", cart=[], session=null;
+const $=id=>document.getElementById(id);
+const demo=[
+{id:"d1",name:"Wireless Earbuds",price:850,category:"Earphone",image_url:"https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=600",description:"Demo product"},
+{id:"d2",name:"Smart Watch",price:1450,category:"Smart Watch",image_url:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600",description:"Demo product"},
+{id:"d3",name:"Fast Charger",price:550,category:"Charger",image_url:"https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600",description:"Demo product"},
+{id:"d4",name:"Bluetooth Speaker",price:1200,category:"Speaker",image_url:"https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=600",description:"Demo product"}
+];
+async function load(){
+ if(db){const {data,error}=await db.from("products").select("*").order("created_at",{ascending:false});if(!error)products=data||[];else products=demo;}
+ else products=demo;
+ render();
+}
+function render(){
+ const cats=["All",...new Set(products.map(p=>p.category).filter(Boolean))];
+ $("categories").innerHTML=cats.map(c=>`<button class="cat ${c===category?'active':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+ $("categories").querySelectorAll("button").forEach(b=>b.onclick=()=>{category=b.dataset.cat;render()});
+ let list=products.filter(p=>(category==="All"||p.category===category)&&(`${p.name} ${p.category} ${p.description||""}`).toLowerCase().includes($("search").value.toLowerCase()));
+ if($("sort").value==="low")list.sort((a,b)=>a.price-b.price);if($("sort").value==="high")list.sort((a,b)=>b.price-a.price);
+ $("products").innerHTML=list.length?list.map(p=>`<article class="product"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}" onerror="this.style.visibility='hidden'"><div class="pbody"><div class="category">${esc(p.category)}</div><div class="pname">${esc(p.name)}</div><div class="price">৳${Number(p.price).toLocaleString("en-BD")}</div><button data-add="${esc(p.id)}">Add to cart</button></div></article>`).join(""):`<div class="empty" style="grid-column:1/-1">No products found. Please check back soon.</div>`;
+ $("products").querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{const p=products.find(x=>String(x.id)===b.dataset.add);if(p){cart.push(p);$("cartCount").textContent=cart.length;b.textContent="Added ✓";setTimeout(()=>b.textContent="Add to cart",900)}});
+ $("cartCount").textContent=cart.length;
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+$("search").oninput=render;$("sort").onchange=render;
+$("cartBtn").onclick=()=>{if(!cart.length){alert("Your cart is empty.");return} $("cartItems").innerHTML=cart.map((p,i)=>`<div class="row"><span>${esc(p.name)} · ৳${Number(p.price).toLocaleString("en-BD")}</span><button class="secondary" data-remove="${i}">×</button></div>`).join("");$("cartTotal").textContent=cart.reduce((s,p)=>s+Number(p.price),0).toLocaleString("en-BD");$("cartItems").querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{cart.splice(+b.dataset.remove,1);$("cartCount").textContent=cart.length;$("cartBtn").click()});$("modal").classList.add("show")};
+$("closeModal").onclick=()=>$("modal").classList.remove("show");
+$("orderBtn").onclick=()=>{const name=$("customerName").value.trim(),addr=$("customerAddress").value.trim();if(!name||!addr){alert("Please enter your name and delivery address.");return}let msg="New order - Tech World%0AName: "+encodeURIComponent(name)+"%0AAddress: "+encodeURIComponent(addr)+"%0A%0A";cart.forEach((p,i)=>msg+=encodeURIComponent((i+1)+". "+p.name+" - ৳"+p.price)+"%0A");msg+="%0ATotal: "+encodeURIComponent("৳"+cart.reduce((s,p)=>s+Number(p.price),0));window.open("https://wa.me/"+WHATSAPP+"?text="+msg,"_blank")};
+$("adminBtn").onclick=()=>{$("adminPanel").classList.toggle("show");$("adminPanel").scrollIntoView({behavior:"smooth"})};
+$("loginBtn").onclick=async()=>{if(!db){$("loginError").textContent="First complete the free Supabase setup in README.md.";return}const {data,error}=await db.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginError").textContent=error.message;return}session=data.session;$("loginModal").classList.remove("show");$("adminStatus").textContent="Signed in. You can add and delete products.";renderAdmin()};
+$("closeLogin").onclick=()=>$("loginModal").classList.remove("show");
+$("logoutBtn").onclick=async()=>{if(db)await db.auth.signOut();session=null;renderAdmin()};
+$("productForm").onsubmit=async e=>{e.preventDefault();if(!session){alert("Please sign in first.");return}const f=new FormData(e.target),p={name:f.get("name"),price:Number(f.get("price")),category:f.get("category"),image_url:f.get("image_url"),description:f.get("description")};const {error}=await db.from("products").insert(p);if(error){alert(error.message);return}e.target.reset();await load();renderAdmin()};
+async function renderAdmin(){if(!session){$("adminList").innerHTML="";$("adminStatus").textContent="Sign in to manage products.";return}$("adminList").innerHTML=products.map(p=>`<div class="adminitem"><span>${esc(p.name)} · ৳${p.price}</span><button class="secondary" data-del="${esc(p.id)}">Delete</button></div>`).join("");$("adminList").querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{if(confirm("Delete this product?")){const {error}=await db.from("products").delete().eq("id",b.dataset.del);if(error)alert(error.message);await load();renderAdmin()}})}
+$("adminBtn").addEventListener("click",()=>{if(!session&&db)$("loginModal").classList.add("show")});
+load();
+</script>
+</body></html>
